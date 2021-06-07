@@ -6,6 +6,9 @@ use App\Post;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
+
+
 class PostController extends Controller
 {
     /**
@@ -37,7 +40,21 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+      $request->validate([
+        'title'=>'required|string|max:225',
+        'content'=>'required|string'
+      ]);
+
+      $data = $request->all();
+
+      $post = new Post();
+      $post->fill($data);
+
+      $post->slug = $this->generateSlug($post->title);
+
+      $post->save();
+
+      return redirect()->route('admin.posts.index');
     }
 
     /**
@@ -59,7 +76,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+      return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -71,7 +88,17 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+      $request->validate([
+        'title'=>'required|string|max:225',
+        'content'=>'required|string'
+      ]);
+
+      $data = $request->all();
+
+      $data['slug'] = $this->generateSlug($data['title'], $post->title != $data['title']);
+      $post->update($data);
+
+      return redirect()->route('admin.posts.index');
     }
 
     /**
@@ -83,5 +110,25 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         //
+    }
+
+    private function generateSlug(string $title, bool $change = true)
+    {
+      $slug = Str::slug($title, '-');
+      if (!$change) {
+        return $slug;
+      }
+      $slug_base = $slug;
+      $counter = 1;
+
+      $post_with_slug = Post::where('slug', '=', $slug)->first();
+      while($post_with_slug) {
+        $slug = $slug_base . '-' . $counter;
+        $counter++;
+
+        $post_with_slug = Post::where('slug', '=', $slug)->first();
+      }
+
+      return $slug;
     }
 }
