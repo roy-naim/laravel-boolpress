@@ -16,7 +16,13 @@
             <div class="card-body">
               {{$post->content}}
               <div class="">
-                <a href="{{route('admin.posts.edit', ['post' => $post->id])}}">Edit</a>
+                <a class="btn btn-primary" href="{{route('admin.posts.edit', ['post' => $post->id])}}">Edit</a>
+                <a class="btn btn-danger"  onclick="event.preventDefault();
+                               this.nextElementSibling.submit();">Delete</a>
+                <form action="{{route('admin.posts.destroy', ['post' => $post->id])}}" method="POST" style="display: none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
               </div>
             </div>
           </div>
