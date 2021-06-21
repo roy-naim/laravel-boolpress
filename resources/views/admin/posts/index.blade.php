@@ -16,6 +16,7 @@
             <div class="card-body">
               {{$post->content}}
               <div class="">
+                <a class="btn btn-primary" href="{{route('posts.show', ['slug' => $post->slug])}}">Show</a>
                 <a class="btn btn-primary" href="{{route('admin.posts.edit', ['post' => $post->id])}}">Edit</a>
                 <a class="btn btn-danger"  onclick="event.preventDefault();
                                this.nextElementSibling.submit();">Delete</a>
